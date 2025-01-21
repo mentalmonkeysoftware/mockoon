@@ -1,0 +1,22 @@
+FROM node:bullseye-slim
+
+ARG version=latest
+
+RUN npm install -g @mockoon/cli@$version
+
+# Install packages using apt-get 
+RUN apt-get update && \
+    apt-get install -y curl tzdata && \
+    rm -rf /var/lib/apt/lists/*
+
+# (Optional) Set noninteractive to avoid tzdata config prompts
+# ENV DEBIAN_FRONTEND=noninteractive
+
+RUN adduser --shell /bin/sh --disabled-password --gecos "" mockoon
+USER mockoon
+
+EXPOSE 3000
+
+ENTRYPOINT ["mockoon-cli", "start", "--disable-log-to-file"]
+
+# Usage: docker run --mount type=bind,source="$(pwd)"/dataFile.json,target=/data,readonly -p <port>:<port> mockoon-test -d data
